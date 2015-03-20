@@ -33,10 +33,10 @@ Davide Anguita, Alessandro Ghio, Luca Oneto, Xavier Parra and Jorge L. Reyes-Ort
 ###Merges the training and the test sets to create one data set.
 The first step creates more descriptive testing and training sets by merging the subject identifier column and activity identifier columns into both the test and train sets.
 Then, the train and test sets are combined with rbind to create one data set names from the features.txt file provided descriptive column names which will be used for subsetting later.
-Below is the combined data set (ommiting excess)
+This can be shown by running the following (ommiting excess)
 
-```{r}
-pandoc.table(head(bigSet,10)[,c(1:8)], style="rmarkdown")
+```
+View(Q1)
 ```
 
 ##Question 2
@@ -54,8 +54,52 @@ The "subject" and "activity" columns were required as well, hence:
 targetCols[c(1,2)] <- TRUE
 ```
 
-Finally, `smallSet <- bigSet[,targetCols]` generates the data set required for question 2 as shown below (trimmed)
+Finally, `smallSet <- bigSet[,targetCols]` generates the data set required for question 2 as shown by running
 
-```{r}
-pandoc.table(head(smallSet,10)[,c(1:8)], style="rmarkdown")
+```
+View(Q2)
+```
+
+
+##Question 3
+###Uses descriptive activity names to name the activities in the data set
+The `activity_labels.txt` file was very small. So, instead of creating an object, I used `lapply()` with a `switch()` function to replace the values in the activity column with the appropriate label. Run the following to see the long list of values written into the activity column:
+
+```
+smallSet$activity<- lapply(smallSet$activity, function(x)switch(x,
+                                              "1"= "WALKING",
+                                              "2"= "WALKING_UPSTAIRS",
+                                              "3"= "WALKING_DOWNSTAIRS",
+                                              "4"= "SITTING",
+                                              "5"= "STANDING",
+                                              "6"= "LAYING"
+))
+##Convert from list into character
+smallSet$activity <- as.character(smallSet$activity)
+Q3 <- smallSet$activity
+View(Q3)
+```
+
+##Question 4
+###Appropriately labels the data set with descriptive variable names. 
+This step was accomplished when I needed labels to conviently subset values. However, the following will redo this process for the sake of responding to this step:
+
+```
+features <- read.table("UCI HAR Dataset/features.txt",header=FALSE)
+colnames(smallSet) <- c("subject","activity",paste(features[,2][ (grepl("mean()", 
+                        names(bigSet)) | grepl("std()", names(bigSet)))]))
+rm(features)
+Q4 <- names(smallSet)
+```
+
+They are quite ugly names, but also descriptive
+
+##Question 5
+###From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+This step is accomplished with an `aggregate()` function that returns the means of all other variables by `subject` and `activity`. A dataframe called `Q5` is tidy because it contains one observation per row, each variable is an independent column, no variable is repeated, and it contains one type of data (aggregated sensor data per activity and subject).
+
+```
+tidy <- aggregate(. ~ subject + activity, data=smallSet, mean)
+Q5 <- tidy
+View(Q5)
 ```
