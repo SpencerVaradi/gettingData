@@ -86,9 +86,12 @@ This step was accomplished when I needed labels to conviently subset values. How
 
 ```
 features <- read.table("UCI HAR Dataset/features.txt",header=FALSE)
-colnames(smallSet) <- c("subject","activity",paste(features[,2][ (grepl("mean()", 
-                        names(bigSet)) | grepl("std()", names(bigSet)))]))
-rm(features)
+index <- (grepl("mean()", features[,2]) | grepl("std()", features[,2]))
+newNames <- as.character(features[,2][index])
+##Better include subject and activity
+newNames <- c("subject","activity",newNames)
+colnames(smallSet) <- newNames
+rm(features,index,newNames)
 Q4 <- names(smallSet)
 ```
 

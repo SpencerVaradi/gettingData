@@ -82,9 +82,12 @@ Q3 <- smallSet$activity
 ##I...am pretty sure that I have when I merged the datasets so I could subset later
 ##But lets do it again
 features <- read.table("UCI HAR Dataset/features.txt",header=FALSE)
-colnames(smallSet) <- c("subject","activity",paste(features[,2][ (grepl("mean()", 
-                        names(bigSet)) | grepl("std()", names(bigSet)))]))
-rm(features)
+index <- (grepl("mean()", features[,2]) | grepl("std()", features[,2]))
+newNames <- as.character(features[,2][index])
+##Better include subject and activity
+newNames <- c("subject","activity",newNames)
+colnames(smallSet) <- newNames
+rm(features,index,newNames)
 Q4 <- names(smallSet)
 ##They are ugly, but pretty descriptive
 
