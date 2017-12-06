@@ -1,7 +1,7 @@
 #For printing tables in markdown file
 #library(pander)
 
-# You should create one R script called run_analysis.R that does the following. 
+# You should create one R script called run_analysis.R that does the following.
 # 1. Merges the training and the test sets to create one data set.
 
 ##I'll need this
@@ -16,6 +16,7 @@ y_test <- read.table("UCI HAR Dataset/test/y_test.txt",header=FALSE)
 test <- cbind(subject_test, y_test, x_test)
 colnames(test) <- c("subject","activity",paste(features[,2]))
 rm(subject_test,x_test,y_test)
+
 
 
 
@@ -42,7 +43,7 @@ Q1 <- bigSet
 
 ####################################################################
 
-# 2. Extracts only the measurements on the mean and standard deviation for each measurement. 
+# 2. Extracts only the measurements on the mean and standard deviation for each measurement.
 
 ##Because I am lazy, find me means and stds for me
 targetCols <- (grepl("mean()", names(bigSet)) | grepl("std()", names(bigSet)))
@@ -77,7 +78,7 @@ Q3 <- smallSet$activity
 
 ####################################################################
 
-# 4. Appropriately labels the data set with descriptive variable names. 
+# 4. Appropriately labels the data set with descriptive variable names.
 
 ##I...am pretty sure that I have when I merged the datasets so I could subset later
 ##But lets do it again
@@ -94,7 +95,7 @@ Q4 <- names(smallSet)
 ####################################################################
 
 # 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-tidy <- aggregate(. ~ subject + activity, data=smallSet, mean)
+tidy <- aggregate(. ~ subject + activity, data= smallSet, mean)
 Q5 <- tidy
 
 write.table(tidy,"tidy.txt", row.names=FALSE)
