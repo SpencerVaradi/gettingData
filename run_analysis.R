@@ -3,6 +3,8 @@
 
 # You should create one R script called run_analysis.R that does the following.
 # 1. Merges the training and the test sets to create one data set.
+activityLabels <- read.table("UCI HAR Dataset/activity_labels.txt")
+activityLabels[,2] <- as.character(activityLabels[,2])
 
 ##I'll need this
 features <- read.table("UCI HAR Dataset/features.txt",header=FALSE)
@@ -27,15 +29,18 @@ y_train <- read.table("UCI HAR Dataset/train/y_train.txt",header=FALSE)
 
 train <- cbind(subject_train, y_train, x_train)
 colnames(train) <- c("subject","activity",paste(features[,2]))
-rm(features,subject_train,x_train,y_train)
+#rm(features,subject_train,x_train,y_train)
 
 ##Combine training and testing set (suppose training would come first)
 bigSet <- rbind(train,test)
+bigSet$activity <- factor(bigSet$activity, levels = activityLabels[,1], labels = activityLabels[,2])
+bigSet$subject <- factor(bigSet$subject)
+
 rm(train,test)
 
 ##Dar she blows
-View(bigSet)
-str(bigSet)
+#View(bigSet)
+#str(bigSet)
 ##Each row is an independent observation of sensor reading over time
 ##Activities are still repeated, however
 Q1 <- bigSet
@@ -46,7 +51,7 @@ Q1 <- bigSet
 # 2. Extracts only the measurements on the mean and standard deviation for each measurement.
 
 ##Because I am lazy, find me means and stds for me
-targetCols <- (grepl("mean()", names(bigSet)) | grepl("std()", names(bigSet)))
+targetCols <- (grepl("*.mean.* | *.std.*", names(bigSet)))
 ##Better include subject and activity
 targetCols[c(1,2)] <- TRUE
 smallSet <- bigSet[,targetCols]
@@ -62,17 +67,17 @@ Q2 <- smallSet
 
 ##activity_labels file is really small and could just be copied and pasted into a switch function. Here ya go.
 
-smallSet$activity<- lapply(smallSet$activity, function(x)switch(x,
-                                              "1"= "WALKING",
-                                              "2"= "WALKING_UPSTAIRS",
-                                              "3"= "WALKING_DOWNSTAIRS",
-                                              "4"= "SITTING",
-                                              "5"= "STANDING",
-                                              "6"= "LAYING"
-))
+# smallSet$activity<- lapply(smallSet$activity, function(x)switch(x,
+#                                               "1"= "WALKING",
+#                                               "2"= "WALKING_UPSTAIRS",
+#                                               "3"= "WALKING_DOWNSTAIRS",
+#                                               "4"= "SITTING",
+#                                               "5"= "STANDING",
+#                                               "6"= "LAYING"
+# ))
 ##Convert from list into character
-smallSet$activity <- as.character(smallSet$activity)
-Q3 <- smallSet$activity
+#smallSet$activity <- as.character(smallSet$activity)
+#Q3 <- smallSet$activity
 ##A much more descriptive activity variable is in there
 
 
@@ -82,20 +87,21 @@ Q3 <- smallSet$activity
 
 ##I...am pretty sure that I have when I merged the datasets so I could subset later
 ##But lets do it again
-features <- read.table("UCI HAR Dataset/features.txt",header=FALSE)
-index <- (grepl("mean()", features[,2]) | grepl("std()", features[,2]))
-newNames <- as.character(features[,2][index])
+#features <- read.table("UCI HAR Dataset/features.txt",header=FALSE)
+#index <- (grepl("mean()", features[,2]) | grepl("std()", features[,2]))
+#newNames <- as.character(features[,2][index])
 ##Better include subject and activity
-newNames <- c("subject","activity",newNames)
-colnames(smallSet) <- newNames
-rm(features,index,newNames)
-Q4 <- names(smallSet)
+#newNames <- c("subject","activity",newNames)
+#colnames(smallSet) <- newNames
+#rm(features,index,newNames)
+#Q4 <- names(smallSet)
 ##They are ugly, but pretty descriptive
 
 ####################################################################
 
 # 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-tidy <- aggregate(. ~ subject + activity, data= smallSet, mean)
+tidy <- aggregate(. ~ activity + subject, data= smallSet, mean)
+tidy <- tidy[,c(2,1,3:ncol(tidy))]
 Q5 <- tidy
 
 write.table(tidy,"tidy.txt", row.names=FALSE)
