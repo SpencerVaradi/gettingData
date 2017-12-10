@@ -63,26 +63,11 @@ View(Q2)
 
 ##Question 3
 ###Uses descriptive activity names to name the activities in the data set
-The `activity_labels.txt` file was very small. So, instead of creating an object, I used `lapply()` with a `switch()` function to replace the values in the activity column with the appropriate label. Run the following to see the long list of values written into the activity column:
-
-```
-smallSet$activity<- lapply(smallSet$activity, function(x)switch(x,
-                                              "1"= "WALKING",
-                                              "2"= "WALKING_UPSTAIRS",
-                                              "3"= "WALKING_DOWNSTAIRS",
-                                              "4"= "SITTING",
-                                              "5"= "STANDING",
-                                              "6"= "LAYING"
-))
-##Convert from list into character
-smallSet$activity <- as.character(smallSet$activity)
-Q3 <- smallSet$activity
-View(Q3)
-```
+Already done
 
 ##Question 4
 ###Appropriately labels the data set with descriptive variable names. 
-This step was accomplished when I needed labels to conviently subset values. However, the following will redo this process for the sake of responding to this step:
+Already Done
 
 ```
 features <- read.table("UCI HAR Dataset/features.txt",header=FALSE)
